@@ -1,9 +1,16 @@
 const functions = require("firebase-functions");
 
 const Telegraf = require("telegraf");
-const fetch = require("node-fetch");
 const Markup = require("telegraf/markup");
 const Extra = require("telegraf/extra");
+
+const fetch = require("node-fetch");
+
+let config = require("./env.json");
+
+if (Object.keys(functions.config()).length) {
+  config = functions.config();
+}
 
 /**
  * Get json fuflomycin data from github
@@ -49,7 +56,7 @@ const getDataFromGithub = async () => {
   return result;
 };
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const bot = new Telegraf(config.service.bot_token);
 
 /**
  * Start message
