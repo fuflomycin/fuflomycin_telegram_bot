@@ -62,14 +62,18 @@ const bot = new Telegraf(config.service.bot_token);
  * Start message
  */
 bot.start(ctx =>
-  ctx.reply("Бот для поиска препаратов по базе фуфломицинов и гомеопатии.")
+  ctx.reply(
+    "Бот для поиска препаратов по базе фуфломицинов и гомеопатии. Напишите полностью или частично название препарата и бот проверит его."
+  )
 );
 
 /**
  * Help message
  */
 bot.help(ctx =>
-  ctx.reply("Напишите название препарата или действующего вещества")
+  ctx.reply(
+    "Напишите полностью или частично название препарата или действующего вещества"
+  )
 );
 
 /**
@@ -80,8 +84,8 @@ bot.help(ctx =>
   bot.command("count", ({ reply }) =>
     reply("Препаратов в базе: " + drugs.length)
   );
-  bot.use(({ message, replyWithHTML, reply }) => {
-    console.log(message);
+  bot.on("message", ({ message, replyWithHTML, reply }) => {
+    // console.log(message);
     const prompt = message.text;
     const p = prompt.toLocaleUpperCase();
     const result = drugs.filter(i => i.index.includes(p));
@@ -103,12 +107,11 @@ bot.help(ctx =>
           "\n\n" +
           result[0].contents.replace(/<p>/g, "").replace(/<\/p>/g, "\n")
       );
-      reply();
+    } else {
+      reply("Такого препарата в базе нет.");
     }
   });
 })();
-
-bot.hears("hi", ctx => ctx.reply("Hey there"));
 
 /**
  * Start bot
@@ -119,5 +122,10 @@ bot.launch();
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 exports.helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
+  try {
+    bot.launch();
+    response.send("Bot started");
+  } catch (err) {
+    response.send("Error" + err);
+  }
 });
